@@ -34,3 +34,27 @@ def test_redeem_more_points_than_available(client):
     # Vérifiez que les points du club n'ont pas été déduits incorrectement
     updated_club = [c for c in loadClubs() if c['name'] == club_name][0]
     assert int(updated_club['points']) == initial_points
+
+def test_purchase_more_max_places(client):
+    club_name = "Simply Lift"
+    competition_name = "Spring Festival"
+    clubs = loadClubs()
+    competitions = loadCompetitions()
+
+    # Assurez-vous d'avoir suffisamment de places disponibles pour le test
+    competition = [comp for comp in competitions if comp['name'] == competition_name][0]
+    initial_number_of_places = int(competition['numberOfPlaces'])
+
+    # Simulez l'envoi d'un formulaire avec une réservation de 13 places (plus que la limite de 12)
+    response = client.post('/purchasePlaces', data={
+        'club': club_name,
+        'competition': competition_name,
+        'places': 13
+    })
+
+    # Vérifiez que la transaction n'est pas autorisée et qu'un message d'erreur est affiché
+    assert 'Impossible de réserver plus de 12 places' in response.get_data(as_text=True)
+
+    # Vérifiez également que le nombre de places disponibles pour la compétition n'a pas été réduit
+    updated_competition = [comp for comp in loadCompetitions() if comp['name'] == competition_name][0]
+    assert int(updated_competition['numberOfPlaces']) == initial_number_of_places
