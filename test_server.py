@@ -58,3 +58,12 @@ def test_purchase_more_max_places(client):
     # Vérifiez également que le nombre de places disponibles pour la compétition n'a pas été réduit
     updated_competition = [comp for comp in loadCompetitions() if comp['name'] == competition_name][0]
     assert int(updated_competition['numberOfPlaces']) == initial_number_of_places
+
+def test_booking_past_competition(client):
+    club_name = "Simply Lift"
+    past_competition_name = "Spring Festival"
+
+    response = client.get(f'/book/{past_competition_name}/{club_name}')
+    assert "Cette compétition est déjà passée et ne peut pas être réservée." in response.get_data(as_text=True)
+
+
