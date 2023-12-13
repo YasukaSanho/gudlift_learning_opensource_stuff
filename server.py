@@ -15,6 +15,9 @@ def loadCompetitions():
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
 
+def saveClubs(updated_clubs):
+    with open('clubs.json', 'w') as file:
+        json.dump({'clubs': updated_clubs}, file)
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -59,6 +62,9 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
+    points_per_place = 1
+
+    total_points_cost = points_per_place * placesRequired
 
     if placesRequired > int(club["points"]):
         flash(f'Vous n avez pas assez de points : seulement {club["points"]} réservés.')
@@ -68,8 +74,9 @@ def purchasePlaces():
         flash("Impossible de réserver plus de 12 places")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    club['points'] = int(club['points']) - placesRequired
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])- placesRequired
+    club['points'] = int(club['points']) - total_points_cost
+    saveClubs(clubs)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 

@@ -67,3 +67,27 @@ def test_booking_past_competition(client):
     assert "Cette compétition est déjà passée et ne peut pas être réservée." in response.get_data(as_text=True)
 
 
+def test_purchase_places_updates_club_points(client):
+    club_name = "Simply Lift"
+    competition_name = "Spring Festival"
+    clubs = loadClubs()
+    competitions = loadCompetitions()
+
+    club = next(c for c in clubs if c['name'] == club_name)
+    initial_points = int(club['points'])
+    places_to_book = 3  # Nombre de places à réserver
+
+    response = client.post('/purchasePlaces', data={
+        'club': club_name,
+        'competition': competition_name,
+        'places': places_to_book
+    })
+
+    updated_clubs = loadClubs()
+
+    # Récupérer les données du club après la réservation
+    updated_club = next(c for c in updated_clubs if c['name'] == club_name)
+
+    # Vérifier si les points du club ont été correctement déduits
+    assert int(updated_club['points']) == initial_points - places_to_book
+
