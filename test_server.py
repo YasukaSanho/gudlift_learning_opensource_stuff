@@ -41,11 +41,10 @@ def test_purchase_more_max_places(client):
     clubs = loadClubs()
     competitions = loadCompetitions()
 
-    # Assurez-vous d'avoir suffisamment de places disponibles pour le test
     competition = [comp for comp in competitions if comp['name'] == competition_name][0]
     initial_number_of_places = int(competition['numberOfPlaces'])
 
-    # Simulez l'envoi d'un formulaire avec une réservation de 13 places (plus que la limite de 12)
+    # Simule l'envoi d'un formulaire avec une réservation de 13 places (plus que la limite de 12)
     response = client.post('/purchasePlaces', data={
         'club': club_name,
         'competition': competition_name,
@@ -90,4 +89,16 @@ def test_purchase_places_updates_club_points(client):
 
     # Vérifier si les points du club ont été correctement déduits
     assert int(updated_club['points']) == initial_points - places_to_book
+
+def test_club_resume_shows_clubs_and_points(client):
+    # Simuler l'accès à la nouvelle page de résumé des clubs
+    response = client.get('/clubsDetails')
+
+    # Charger les données des clubs pour la vérification
+    clubs = loadClubs()
+
+    # Vérifier si chaque club et son solde de points sont présents dans la réponse
+    for club in clubs:
+        assert club['name'] in response.get_data(as_text=True)
+        assert str(club['points']) in response.get_data(as_text=True)
 
