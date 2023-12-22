@@ -48,7 +48,7 @@ def book(competition,club):
 
     if competition_date < datetime.now():
         flash("Cette compétition est déjà passée et ne peut pas être réservée.")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=foundClub, competitions=competitions)
 
     if foundClub and foundCompetition:
         return render_template('booking.html',club=foundClub,competition=foundCompetition)
