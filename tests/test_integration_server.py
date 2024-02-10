@@ -1,5 +1,5 @@
 import pytest
-from ..server import app, loadClubs, loadCompetitions
+from ..server_learning import app, loadClubs, loadCompetitions
 from flask import url_for
 
 @pytest.fixture
