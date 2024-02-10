@@ -10,7 +10,7 @@ def client():
 def test_email_introuvable(client):
     response = client.post('/showSummary', data={'email': 'emailinexistant@example.com'})
     assert response.status_code == 200
-    assert 'email introuvable' in response.data.decode('utf-8')
+    assert "Can't find the email" in response.data.decode('utf-8')
 
 
 def test_redeem_more_points_than_available(client):
